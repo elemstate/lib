@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>elemstate-lib by elemstate</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>elemstate-lib</h1>
+        <p></p>
+
+        <p class="view"><a href="https://github.com/elemstate/lib">View the Project on GitHub <small>elemstate/lib</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/elemstate/lib/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/elemstate/lib/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/elemstate/lib">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>elemstate-lib is a javascript library that uses a simple state machine model to set CSS classes on HTML elements.</p>
+
+<p>The ESMCssRoot attribute is used to apply elemstate functionality to an element, as follows:</p>
+
+<p><code>&lt;div esmCssRoot='hello'&gt;hello, i'm the hello tool&lt;/div&gt;</code></p>
+
+<p>CSS is declared for the applicable states for each root name (root_state), as follows:</p>
+
+<p><code>
+  .hello {..}<br>
+  .hello_focused {..}<br>
+  .hello_toggled {..}<br>
+  .hello_waiting {..}<br></code></p>
+
+<p>When a state is added or removed on an element (during an event or with a call to ESM.setState), the CSS class is changed to reflect the new combination.</p>
+
+<p>Assuming all the above states are active on the hello element, statetools would set:</p>
+
+<p><code>class = 'hello hello_focused hello_toggled hello_waiting'</code></p>
+
+<p>elemstate.js (in the gh_pages branch) contains more detailed doc.</p>
+
+<p><a href="http://elemstate.github.io/lib/elemstate/statetools_helloworld.html">Demo page</a></p>
+
+<p>An application that uses elemstate-lib:
+<a href="http://thoughtwallet.github.io/wallet">ThoughtWallet</a></p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/elemstate">elemstate</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
