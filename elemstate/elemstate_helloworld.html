@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<!--sample for Element State Library elemstate.js (public domain)-->
+
+<html>
+<head>
+<meta charset="utf-8" />
+
+<!---------------------- C S S -------------------------->
+<style>
+.hello {
+  margin:0; border:1px; padding:0.25em 0.5em;
+  background-color:#e0e0e0; color:gray;
+  border-color:gray; border-style:dashed;
+}
+/*.hello_pressed {
+  background-color:white;
+}*/
+.hello_hover {
+  background-color:#f0f0f0; color:#0000FF; border-color:#0000FF;
+}
+.hello_focused {
+  background-color:#FFFFb0; color:#00FF00;
+  border-color:#00FF00; border-style:solid;
+  box-shadow:3px 3px 3px #888888;
+}
+.hello_childfocused {
+  background-color:#f0f0d0;
+}
+</style>
+
+<script src="../transev/transev.js"></script>
+<script src="elemstate.js"></script>
+</head>
+
+<!---------------------- H T M L ------------------------>
+<body onload="ESM.initPage()" style="margin:2em 4em;">
+
+<h3>Element State Library
+(<a href="elemstate.js">elemstate.js</a>) Basic Sample</h3>
+
+<p>&nbsp;</p>
+
+<div esmcssRoot="hello" style="width:40%;">
+  H E L L O &nbsp; W O R L D
+  <br/><br/>
+  <div esmcssroot="hello">first box<br/>
+    <input type="text" size="30" id="inp2" value="hello">
+    <br/><br/>
+    <button esmcssroot="hello">nested inside 1</button>
+    <button esmcssroot="hello">nested inside 2</button>
+  </div>
+  <br/>
+  <input type="text" size="30" id="inp1" value="world">
+  <br/><br/>
+  <button esmcssroot="hello">second box</button>
+</div>
+
+<br/><p>Boxes appear to "activate" on click or focus, 
+clear on click or focus outside</p>
+
+<p><a href="elemstate_test.html">Test page</a></p>
+
+<p>elemstate.js relies on transev (transition events,
+<a href="../transev/transev_test.html">transev test page</a>)</p>
+
+</body>
+</html>
