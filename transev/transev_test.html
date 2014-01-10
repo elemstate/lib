@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<!--Test page for transev.js (public domain)-->
+
+<html>
+<head>
+<meta charset="utf-8" />
+
+<!--////////////////////////////// C S S //////////////////////////////// -->
+<style>
+body { font-size:85%; font-family:"Trebuchet MS", sans-serif; 
+  margin:0; padding:0; width:98%; height:100%; vertical-align:top; }
+table, td { margin:0px; padding:0px; border:0px; vertical-align:top;}
+.box1, .box1grayed, .box1hover, .rot, .rotgrayed, .rothover { 
+  margin:0px; border:0px; color:#00FF00; background-color:#FFFF80; z-index:-1;}
+.box2, .box2grayed, .box2hover {
+  margin:0px; padding:5px; border:2px dashed #404040; color:gray;
+  background-color:#FFFF80; border-radius:15px; z-index:1; }
+.box1grayed, .box2grayed, .rotgrayed { 
+	color:gray; border-color:gray; opacity:0.5; }
+.box2hover { opacity:0.75; border:2px dashed #0000FF; color:#0000FF;}
+.box2 { border:2px solid #00FF00; color:#00FF00; 
+	box-shadow: 10px 10px 5px #888888; }
+.rot, .rotgrayed, .rothover { 
+  transform:rotate(10deg); 
+  -ms-transform:rotate(10deg); /* IE 9 */
+  -moz-transform:rotate(10deg); /* Firefox */
+  -webkit-transform:rotate(10deg); /* Safari and Chrome */
+  -o-transform:rotate(10deg); /* Opera */
+  border:1px solid #00FF00; z-index:0;}
+.box1hover, .rothover { color:#0000FF; opacity:0.75; }
+.rothover { border-color:#0000FF; }
+.rotgrayed { border-color:gray; }
+.smalltext { font-size:80%; }
+h3 { font-size:120%; line-height:90%; }
+.cons {border:1px inset gray; 
+  width:30em; height:30em; overflow-y:scroll;
+  font-size:85%; font-family:"courier new","lucida console",monospace;}
+.evm {color:green;}
+.evc {color:red;}
+.evf {color:blue;}
+</style>
+<!--////////////////////////////// C S S //////////////////////////////// -->
+
+
+<!--//////////////////////////// S C R I P T //////////////////////////// -->
+<script src="transev.js"></script>
+<script>
+
+////functions to control debug window
+var dbggr = null;
+function verbose( on ) {
+  if (!on)
+    dbggr.eventsExclude = new Array( "Inside", "Outside" );
+  else
+    dbggr.eventsExclude = null;
+}
+function details( on ) {
+  dbggr.details = on;
+}
+function JSdebug( on ) {
+  dbggr.addJSevents = on;
+}
+function showcon( trace ) { //callback from debugger
+  var con = document.getElementById("console");
+  con.innerHTML += trace + "\r\n<br/>";
+  con.scrollTop = con.scrollHeight;
+}
+
+////functions to light up widgets using the TEM events
+function ins( xe ) {
+  if (!xe.userData.lit)
+      xe.getElem().className = xe.userData.cls;
+  xe.userData.lit = true;
+}
+function outs( xe ) {
+  if (xe.userData.lit)
+    xe.getElem().className = xe.userData.clsGray;
+  xe.userData.lit = false;
+}
+function msmv( xe, ecls ) {
+  if (!xe.userData.lit)
+    xe.getElem().className = ecls;
+}
+
+////event handlers
+function msEnt() {msmv(this,this.userData.clsHov);}
+function msExit() {msmv(this,this.userData.clsGray);}
+function clkEnt() {ins(this);}
+function clkExit() {outs(this);}
+function clkIn() {ins(this);}
+function clkOut() {outs(this);}
+function focEnt() {ins(this);}
+function focExit() {outs(this);}
+function focIn() {ins(this);}
+function focOut() {outs(this);}
+
+function FOXclk() {/*showstr("Normal JS click in FOX");*/}
+
+////code to init widgets
+var evs = { click:{ Enter: clkEnt, Exit: clkExit,
+                    Inside: clkIn, Outside: clkOut },
+            focus:{ Enter: focEnt, Exit: focExit,
+                    Inside: focIn, Outside: focOut },
+            mouse:{ Enter: msEnt, Exit: msExit
+            /*,Outside: msOut*/ } }
+var elemDefs = [];
+elemDefs[0] = { elemOrId:"FOX", events:evs, userData:{lit:false, 
+                cls:"box1", clsGray:"box1grayed", clsHov:"box1hover"}}
+elemDefs[1] = { elemOrId:"SHARK", events:evs, userData:{lit:false, 
+                cls:"box2", clsGray:"box2grayed", clsHov:"box2hover"}}
+elemDefs[2] = { elemOrId:"TUNA", events:evs, userData:{lit:false, 
+                cls:"rot", clsGray:"rotgrayed", clsHov:"rothover"}}
+elemDefs[3] = { elemOrId:"SALMON", events:evs, userData:{lit:false, 
+                cls:"rot", clsGray:"rotgrayed", clsHov:"rothover"}}
+elemDefs[4] = { elemOrId:"MINNOW", events:evs, userData:{lit:false, 
+                cls:"box1", clsGray:"box1grayed", clsHov:"box1hover"}}
+elemDefs[5] = { elemOrId:"BARNACLE", events:evs, userData:{lit:false, 
+                cls:"box1", clsGray:"box1grayed", clsHov:"box1hover"}}
+
+function pgload( ) {
+  document.getElementById("FOX").onclick = FOXclk;
+  dbggr = TEM.debuggerStart();
+  dbggr.callback = showcon;
+  verbose( false );
+  TEM.init( elemDefs );
+  document.getElementById("showdetails").checked = dbggr.details;
+  document.getElementById("showtrans").checked = dbggr.eventsExclude;
+  document.getElementById("showdebug").checked = dbggr.addJSevents;
+  document.getElementById("foxdisabled").disabled = true;
+}
+
+///move elem in DOM, adjust activations
+function moveElem( elemId, destParentId ) {
+  var xe = TEM.getElemAttachment( elemId );
+  if (xe) {
+    var e = xe.getElem();
+    e = e.parentNode.removeChild( e );
+    var dest = document.getElementById( destParentId );
+    dest.appendChild( e );
+  }
+}
+var salmonloc = "sharkbelly";
+var salmonlit = null;
+function movSalmon() {
+  if (salmonloc == "sharkbelly")
+    salmonloc = "movehere";
+  else
+    if (salmonloc == "movehere")
+      salmonloc = "foxbelly";
+    else
+      salmonloc = "sharkbelly";
+  moveElem( "SALMON", salmonloc );
+  TEM.burstEvent( "mouse", null );
+  if (salmonlit)
+    TEM.burstEvent( "click", salmonlit );
+}
+function moveSalmon() {
+  setTimeout( 'movSalmon();', 50 ); //wait for click event
+}
+function pauseResume( p ) {
+  salmonlit = null;
+  var xe = TEM.getElemAttachment( "SALMON" );
+  if (xe.userData.lit)
+    salmonlit = xe.getElem();
+  var xe = TEM.getElemAttachment( "MINNOW" );
+  if (xe.userData.lit)
+    salmonlit = xe.getElem();
+}
+</script>
+<!--//////////////////////////// S C R I P T //////////////////////////// -->
+
+
+<!--////////////////////////////// H T M L ////////////////////////////// -->
+</head>
+
+<body id="page" onload="pgload()">
+<table style="height:100%;width:100%;margin:1em;"><tr>
+<td style="width:33%;">
+
+
+<h3 id="pagetitle">Test page for 
+<a href="transev.js" id="jslink">transev.js</a></h3>
+
+<div class="smalltext">
+<input type="checkbox" id="showdetails" onclick="details(this.checked);">
+Show event details</input> &nbsp;
+<input type="checkbox" id="showtrans" onclick="verbose(!this.checked);">
+Show only in/out transitions</input>
+</div>
+
+<div id="console" class="cons"></div>
+<!--<textarea id="console" rows="20" cols="50"></textarea>-->
+
+<div class="smalltext">
+<input type="checkbox" id="showdebug" onclick="JSdebug(this.checked);">
+Show JS event trace</input>
+</div>
+
+<p><button onclick="moveSalmon();"
+onmouseover="pauseResume(true)" onmouseout="pauseResume(false)"
+onfocus="pauseResume(true)" onblur="pauseResume(false)">
+Move Salmon</button><br/>
+</p>
+
+</td><td id="vgap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="width:20%;">
+
+
+<div id="FOX" class="box1grayed"><form action="">
+<p id="foxhead">F O X</p>
+<p class="smalltext">(inside elements flush to edge)</p>
+<input type="text" size="10" id="foxdisabled" value="disabled"><br/>
+<input type="text" size="5" value="foxtrot"><br/>
+<span id="foxbelly"></span>
+<textarea rows="5" cols="25">Hello world</textarea><br/>
+<button onclick="return false;">Submit</button></form></div>
+
+<div style="text-align:center;">
+
+<p id="actdescr">Widgets "activate" on click or focus</p>
+
+<div id="SHARK" class="box2grayed"><p id="sharkhead">S H A R K</p>
+  <button id="TUNA" class="rotgrayed">&nbsp;T U N A&nbsp;</button><br/>
+  <span id="sharkbelly">
+  <div id="SALMON" class="rotgrayed">
+    <span id="salmonhead">S A L M O N</span><br/>
+    <input type="text" name="i2" id="salmoninp" size="15" value="fin"><br/>
+    <button id="MINNOW" class="box1grayed" onclick="return false;">
+                     &nbsp;M I N N O W&nbsp;</button>
+  </div>
+  </span>
+</div>
+
+<button id="BARNACLE" class="box1grayed">B A R N A C L E</button><br/>
+
+<span id="movehere"></span>
+
+</div>
+
+
+
+</td><td id="vgap2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="width:33%;">
+
+
+<div class="smalltext" id="doc">
+
+<p>transev.js (Transition Event Model): extends an element with handlers
+to detect inside vs.
+outside and inside/outside transitions:</p>
+
+<p><span class="evm">mouseEnter:</span><br/>
+    Mouse has entered element boundary from outside.</p>
+<p><span class="evm">mouseExit:</span><br/>
+    Mouse has exited container boundary to outside.</p>
+<p><span class="evc">clickEnter:</span><br/>
+    A click inside after a click somewhere outside.</p>
+<p><span class="evc">clickExit:</span><br/>
+    A click somewhere outside after a click inside.</p>
+<p><span class="evc">clickInside:</span><br/>
+    A click anywhere inside.</p>
+<p><span class="evc">clickOutside:</span><br/> 
+    A click somewhere outside.</p>
+<p><span class="evf">focusEnter:</span><br/> 
+    An element inside is receiving focus from outside.</p>
+<p><span class="evf">focusExit:</span><br/> 
+    An element inside is losing focus to outside.</p>
+<p><span class="evf">focusInside:</span><br/> 
+    An element inside is receiving focus.</p>
+<p><span class="evf">focusOutside:</span><br/> 
+    An element outside is receiving focus.</p>
+</div>
+
+<!--<textarea id="debugg" rows="10" cols="40" ></textarea>-->
+
+
+</td></tr></table>
+</body>
+
+<!--////////////////////////////// H T M L ////////////////////////////// -->
+</html>
