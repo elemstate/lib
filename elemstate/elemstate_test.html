@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<!--test page for Element State Library, elemstate.js (public domain)-->
+
+<html>
+<head>
+<meta charset="utf-8" />
+
+<!---------------------- C S S -------------------------->
+<style>
+body {
+  font-size:85%; font-family:"Trebuchet MS", sans-serif;
+}
+.smalltext {
+  font-size:80%;
+}
+h3 {
+  font-size:120%; line-height:90%;
+}
+.cons {
+  width:25em; height:35em; 
+  font-size:85%; font-family:"courier new","lucida console",monospace;
+}
+.cons div {
+  border:1px solid #606060; overflow-y:scroll;
+}
+table, td {
+  border:0;margin:0;padding:0;vertical-align:top;text-align:left;
+}
+/*
+styles for elements using ESMcssMethod='stepback' 
+*/
+.minbox, .minbox_focused, .minbox_hover, .minbox_pressed, 
+    .minbox_clicked_hover,
+.rndbox, .rndbox_focused, .rndbox_hover, .rndbox_pressed,
+    .rndbox_clicked_hover, 
+.rotbox, .rotbox_focused, .rotbox_hover, .rotbox_pressed,
+    .rotbox_clicked_hover { 
+  margin:0; border:1px; padding:0.25em 0.5em;
+  background-color:#FFFF80; color:#00FF00;
+  border-color:#00FF00; border-style:solid;
+}
+.minbox, .minbox_hover, .minbox_clicked_hover, .minbox_pressed,
+.rndbox, .rndbox_hover, .rndbox_clicked_hover, .rndbox_pressed,
+.rotbox, .rotbox_hover, .rotbox_clicked_hover, .rotbox_pressed { 
+  border-style:dashed;
+}
+.minbox_hover, .rndbox_hover, .rotbox_hover,
+.minbox_clicked_hover, .rndbox_clicked_hover, .rotbox_clicked_hover,
+.minbox_pressed, .rndbox_pressed, .rotbox_pressed {
+  opacity:0.85; color:#0000FF; border-color:#0000FF;
+}
+.minbox, .rndbox, .rotbox {
+  opacity:0.7; color:gray; border-color:gray;
+}
+.rndbox, .rndbox_focused, .rndbox_hover, .rndbox_clicked_hover,
+.rndbox_pressed  {
+  border-width:2px; border-radius:10px;
+}
+.rndbox_focused {
+  box-shadow:10px 10px 5px #888888;
+}
+.rotbox, .rotbox_focused, .rotbox_hover, 
+.rotbox_clicked_hover, .rotbox_pressed {
+  border-width:1px;
+  transform:rotate(10deg);
+  -moz-transform:rotate(10deg); 
+  -webkit-transform:rotate(10deg);
+  -o-transform:rotate(10deg); 
+  -ms-transform:rotate(10deg);
+}
+/*
+styles for elements using ESMcssMethod='combine'
+*/
+.combox { 
+  margin:0; border:1px; padding:0.25em 0.5em;
+  background-color:#FFFF80; color:gray;
+  opacity:0.7; border-color:gray; border-style:dashed;
+}
+.combox_hover { 
+  opacity:0.85; color:#0000FF; border-color:#0000FF;
+}
+.combox_focused { 
+  opacity:1; color:#00FF00; border-color:#00FF00; border-style:solid;
+}
+.combox_pressed { 
+  background-color:white;
+}
+</style>
+
+<!--------------------- S C R I P T ---------------------->
+<script src="../transev/transev.js"></script>
+<script src="elemstate.js"></script>
+<script>
+var dbggr = null;
+
+/*
+ * code to show console messages
+ */
+var acti = 1;
+var lnbrk = "\r\n";
+function showcon( st, staTEMsg ) {
+  var con = document.getElementById("console");
+  if (!staTEMsg)
+    con.innerHTML += "&nbsp;&nbsp;trace ";
+  con.innerHTML += '[' + acti + '] ' + st + lnbrk;
+  acti++;
+  con.scrollTop = con.scrollHeight;
+}
+function onStateChange( elem, state, substate, enable ) {
+  var sts = "'" + elem.id + "' ";
+  if (substate)
+    sts += (enable ? "+" : "-") + substate;
+  var statestr = state.toString();
+  sts += lnbrk+"&nbsp;&nbsp;&nbsp;&nbsp;state:"+(statestr?statestr:'(off)');
+  statestr = this.selState;
+  sts += lnbrk+"&nbsp;&nbsp;&nbsp;&nbsp;class:" + elem.className;
+  showcon( sts, true );
+}
+
+/*
+ * initialize elements declared with HTML attributes
+ */
+function initHTMLTools( ) {
+  ESM.initPage( onStateChange );
+}
+
+/*
+ * initialize other elements with JS instead of HTML
+ */
+var eDefs = [];
+eDefs[1] = {elemOrId:"SHARK",attributes:{cssroot:'rndbox'}}
+eDefs[2] = {elemOrId:"TUNA",attributes:{cssroot:'rotbox'}}
+eDefs[3] = {elemOrId:"SALMON",attributes:{cssroot:'rotbox'}}
+eDefs[4] = {elemOrId:"ANCHOVY",attributes:{cssroot:'minbox'}}
+eDefs[5] = {elemOrId:"BARNACLE",attributes:{cssroot:'minbox'}}
+function initJSTools( ) {
+  ESM.initElems( eDefs, onStateChange );
+}
+
+function pgload( ) {
+  var con = document.getElementById("console");
+  con.innerHTML = "";
+  //document.getElementById("showdebug").checked = false;
+  dbggr = TEM.debuggerStart();
+  dbggr.addTEMevents = false;
+  dbggr.eventsExclude = new Array("mouse");
+  dbggr.callback = showcon;
+  /*setup tools defined in HTML*/
+  ESM.defaultAttributes.cssmethod = 'stepback';
+  initHTMLTools();
+  /*setup tools defined by toolDef array*/
+  initJSTools();
+}
+</script>
+</head>
+
+<!----------------------- H T M L ------------------------>
+<body id="page" onload="pgload()">
+<table><tr>
+<td style="width:25%;">
+
+
+<h3>Test page for Element State Library
+(<a href="elemstate.js" id="jslink">elemstate.js</a>)</h3>
+
+<div class="smalltext">State changes:</div>
+
+<!--<div id="console" class="cons"></div>-->
+<textarea id="console" cols=40 rows=30></textarea>
+
+<div class="smalltext">
+<!--<input type="checkbox" id="showdebug" 
+  onclick="dbggr.addTEMevents=this.checked;">
+Show TEM debug trace</input>-->
+</div>
+
+
+</td><td style="width:10%;">&nbsp;</td>
+<td style="width:25%;">
+
+
+<br/>
+ESMCssMethod="combine"<br/>
+<br/>
+
+<div id="HEDGEHOG" ESMcssRoot="combox" ESMcssMethod="combine">
+H E D G E H O G <br/>
+<div class="smalltext">
+div, not tabbed<br/>
+</div>
+</div>
+
+<p>&nbsp;</p>
+<button id="RABBIT" ESMcssroot="combox" 
+ ESMcssMethod="combine" ESMxxxid='yyy'>R A B B I T
+<br/>
+<div class="smalltext">
+button<br/>
+</div>
+</button><br/>
+
+<br/><p>Widgets "activate" on click or focus</p>
+
+
+</td><td style="width:10%;">&nbsp;</td>
+<td style="width:25%;">
+
+
+<br/>
+ESMCssMethod="stepback"</br>
+<br/>
+
+<div style="text-align:center;">
+<div id="SHARK">S H A R K<br/><br/>
+  <span id="sharkbelly">
+  <div id="LEG" ESMcssroot="minbox">&nbsp;L E G&nbsp;
+(div,not tabbed)</div><br/>
+  <button id="SEAL" ESMcssroot="rotbox">S E A L</button><br/>
+  <div id="TUNA">
+    <span>T U N A</span><br/>
+    <input type="text" name="i2" id="tunainp" size="15" value="fin"><br/>
+    <div id="SALMON" ESMfocusid="MINNOW">S A L M O N<br/>
+      <button id="ANCHOVY" onclick="return false;">A N C H O V Y</button>
+    </div>
+  </div>
+  </span>
+</div>
+<button id="BARNACLE">B A R N A C L E</button><br/>
+</div>
+
+
+</td><td style="width:5%;">&nbsp;
+</td></tr></table>
+</body>
+</html>
